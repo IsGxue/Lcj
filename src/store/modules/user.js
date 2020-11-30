@@ -1,5 +1,10 @@
+
+import {
+  login
+} from '../../api/user'
+
 const state = {
-  token: 'token111',
+  token: '',
 }
 
 const mutations = {
@@ -11,19 +16,19 @@ const actions = {
     commit
   }, userInfo) {
     const {
-      username,
+      loginName,
       password
     } = userInfo
     return new Promise((resolve, reject) => {
       login({
-        username: username.trim(),
+        loginName: loginName.trim(),
         password: password
       }).then(response => {
         const {
           data
         } = response
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
+        commit('SET_TOKEN', data.response.result.token)
+        console.log(response)
         resolve()
       }).catch(error => {
         reject(error)
@@ -32,9 +37,8 @@ const actions = {
   },
 }
 export default {
-    namespaced: true,
-    state,
-    mutations,
-    actions
-  }
-  
+  namespaced: true,
+  state,
+  mutations,
+  actions
+}

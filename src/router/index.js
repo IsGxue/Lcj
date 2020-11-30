@@ -5,11 +5,32 @@ import HelloWorld from '@/views/login/index.vue';
 Vue.use(Router)
 
 export default new Router({
-  routes: [
+  routes: [{
+      path: '/login',
+      name: 'login',
+      component: HelloWorld
+    },
     {
       path: '/',
-      name: 'HelloWorld',
-      component: HelloWorld
-    }
+      redirect: '/home',
+      name: 'home',
+      meta: {
+        hideInMenu: true,
+        title: '首页',
+        notCache: true,
+        icon: 'iconhome',
+        flag: true,
+      },
+      component: () => import('@/views/home/index'),
+      children: [{
+        path: '/home',
+        component: () => import('@/views/home/index'),
+        name: 'home',
+        meta: {
+          title: 'home',
+          icon: 'home',
+        }
+      }]
+    },
   ]
 })

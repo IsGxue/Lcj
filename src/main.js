@@ -5,9 +5,10 @@ import App from './App'
 import router from './router'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
-require('./mock/mock');
-
+import Mock from './mock/index'
+import store from './store'
 import axios from 'axios';
+import './permission';
 Vue.prototype.$axios = axios;
 Vue.use(ElementUI);
 
@@ -15,7 +16,7 @@ Vue.use(ElementUI);
 
 Vue.config.productionTip = false
 if (process.env.NODE_ENV === 'development') { //开发环境
-  // Mock();
+  Mock();
 }
 
 
@@ -23,6 +24,7 @@ if (process.env.NODE_ENV === 'development') { //开发环境
 new Vue({
   el: '#app',
   router,
+  store,
   components: {
     App
   },

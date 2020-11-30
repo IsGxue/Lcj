@@ -1,27 +1,29 @@
 import axios from 'axios';
 import store from '../store/index'
-import { Message } from 'element-ui';
+import {
+  Message
+} from 'element-ui';
 
 axios.defaults.timeout = 10000;
+axios.defaults.baseURL = process.env.VUE_APP_BASEAPI|| '123';
 axios.defaults.headers['Content-Type'] = 'application/json;odata.metadata=minimal;odata.streaming=true';
 // 请求拦截器
 axios.interceptors.request.use(config => {
-
     // 每次发送请求之前判断vuex中是否存在token        
     // 如果存在，则统一在http请求的header都加上token，这样后台根据token判断你的登录情况
     // 即使本地存在token，也有可能token是过期的，所以在响应拦截器中要对返回状态进行判断 
-    const token = store.state.token;
-    token && (config.headers.Authorization = `Bearer ` + token);
+    const token = store.getters.token;
+    if (token) {
+      config.headers['Authorization'] = `Bearer ` + token
+    }
     return config;
   },
   error => {
-
     return Promise.error(error);
   })
 
 axios.interceptors.response.use(
   response => {
-    debugger
     // 如果返回的状态码为200，说明接口请求成功，可以正常拿到数据     
     // 否则的话抛出错误
     if (response.status === 200) {
@@ -35,7 +37,6 @@ axios.interceptors.response.use(
   // 然后根据返回的状态码进行一些操作，例如登录过期提示，错误提示等等
   // 下面列举几个常见的操作，其他需求可自行扩展
   error => {
-    debugger
     if (error.response.status) {
       switch (error.response.status) {
         // 401: 未登录
@@ -77,3 +78,5 @@ axios.interceptors.response.use(
       return Promise.reject(error.response);
     }
   })
+
+export default axios

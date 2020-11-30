@@ -15,7 +15,11 @@
         >
           <el-form-item prop="loginName">
             <span class="icon"> <i class="el-icon-user icon_img"></i></span>
-            <el-input type="text" v-model="ruleForm.loginName"></el-input>
+            <el-input
+              type="text"
+              ref="loginName"
+              v-model="ruleForm.loginName"
+            ></el-input>
           </el-form-item>
           <el-form-item prop="password">
             <span class="icon"> <i class="el-icon-user"></i></span>
@@ -23,6 +27,7 @@
               type="password"
               v-model="ruleForm.password"
               autocomplete="off"
+              ref="password"
             ></el-input>
           </el-form-item>
           <el-button type="primary" @click="submitForm('ruleForm')"
@@ -35,7 +40,7 @@
 </template>
 
 <script>
-import mock from "../../mock/mock";
+import mock from "../../mock/index";
 import axios from "../../api/axios";
 export default {
   data() {
@@ -58,40 +63,62 @@ export default {
         loginName: "",
         password: "",
       },
+      otherQuery: "",
+      redirect: "",
       rules: {
         loginName: [{ required: true, validator: loginName, trigger: "blur" }],
         password: [{ required: true, validator: password, trigger: "blur" }],
       },
     };
   },
+  watch: {
+    $route: {
+      handler: function (route) {
+        const query = route.query;
+        if (query) {
+          this.redirect = query.redirect;
+          this.otherQuery = this.getOtherQuery(query);
+        }
+      },
+      immediate: true,
+    },
+  },
+  mounted() {
+    if (this.ruleForm.loginName === "") {
+      this.$refs.loginName.focus();
+    } else if (this.ruleForm.password === "") {
+      this.$refs.password.focus();
+    }
+  },
   methods: {
     submitForm(formName) {
-      // 可选地，上面的请求可以这样做
-      this.$axios
-        .get("/login", {
-          data: {
-            loginName: 'test',
-            password:123
-          },
-        })
-        .then(function (response) {
-          console.log(response,'response');
-        })
-        .catch(function (error) {
-          console.log(error,'error');
-        });
-
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          alert("submit!");
+          this.$store
+            .dispatch("user/login", this.ruleForm)
+            .then(() => {
+              console.log(process.env);
+              this.$router.push({
+                path: this.redirect || "/",
+                query: this.otherQuery,
+              });
+            })
+            .catch(() => {});
         } else {
-          console.log("error submit!!");
           return false;
         }
       });
     },
     resetForm(formName) {
       this.$refs[formName].resetFields();
+    },
+    getOtherQuery(query) {
+      return Object.keys(query).reduce((acc, cur) => {
+        if (cur !== "redirect") {
+          acc[cur] = query[cur];
+        }
+        return acc;
+      }, {});
     },
   },
 };
@@ -157,14 +184,19 @@ h1 {
   display: inline-block;
   height: 47px;
   width: 90%;
+  color: #fff !important;
   /deep/.el-input__inner {
     background: transparent !important;
     border: none;
     height: 45px;
     line-height: 45px;
   }
+  /deep/.el-input__inner {
+    color: #fff !important;
+  }
   input {
     background: transparent !important;
+    color: #fff !important;
     border: 0px;
     -webkit-appearance: none;
     border-radius: 0px;
