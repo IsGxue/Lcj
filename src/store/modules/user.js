@@ -1,10 +1,14 @@
-
 import {
   login
 } from '../../api/user'
 
+import {
+  getToken,
+  setToken,
+  removeToken
+} from '@/api/storage'
 const state = {
-  token: '',
+  token: getToken(),
 }
 
 const mutations = {
@@ -27,8 +31,9 @@ const actions = {
         const {
           data
         } = response
-        commit('SET_TOKEN', data.response.result.token)
-        console.log(response)
+        setToken('TOKEN', data.response.result.token)
+        setToken('REFRESHTOKEN', data.response.result.refreshToken);
+        // console.log(response)
         resolve()
       }).catch(error => {
         reject(error)

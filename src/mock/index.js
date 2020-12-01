@@ -1,17 +1,13 @@
 //引入mock模块
 import Mock from 'mockjs';
+import user from './modules/uesr'
 import {
   Random,
   toJSONSchema
 } from 'mockjs' // 引入random对象,随机生成数据的对象，（与占位符@一样）
 
 
-
-// Mock.mock('/.*login.*/', 'get', { //输出数据
-//   loginName: 'test', //随机生成姓名
-//   password: 23, //随机生成姓名
-//   //还可以自定义其他数据
-// });
+const mocks = [...user]
 
 const getdata = function (option) { //定义请求数据方法
   let datalist = {
@@ -29,6 +25,40 @@ const getdata = function (option) { //定义请求数据方法
     response: datalist
   }
 }
+
+
+fnCreate(user)
+function fnCreate(){
+  mocks.forEach(item=>{
+    debugger
+    if(item.open){
+      Mock.mock(new RegExp(item.url), item.type.toLowerCase() || 'get', XHR2ExpressReqWrap(item.response))
+    }
+  })
+}
+
+
+function XHR2ExpressReqWrap(respond) {
+  return function(options) {
+    let result = null
+    if (respond instanceof Function) {
+      const { body, type, url } = options
+      
+      result = respond({
+        method: type,
+        body: JSON.parse(body),
+        query: param2Obj(url)
+      })
+    } else {
+      result = respond
+    }
+    return Mock.mock(result)
+  }
+}
+
+
+
+
 
 Mock.mock(/.*login.*/, /post|get/i, getdata);
 export default Mock.mock

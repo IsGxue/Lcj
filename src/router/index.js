@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import HelloWorld from '@/views/login/index.vue';
+import layout from '@/layout/index.vue';
 
 Vue.use(Router)
 
@@ -21,7 +22,7 @@ export default new Router({
         icon: 'iconhome',
         flag: true,
       },
-      component: () => import('@/views/home/index'),
+      component: layout,
       children: [{
         path: '/home',
         component: () => import('@/views/home/index'),

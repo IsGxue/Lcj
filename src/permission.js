@@ -1,17 +1,16 @@
 import router from './router'
 import store from './store'
 
+import {
+  getToken
+} from '@/api/storage';
 router.beforeEach((to, from, next) => {
-  const hasToken = store.getters.token;
-  if (!hasToken && to.path != '/login') {
+  let hasToken = getToken();
+  if (!hasToken && to.path != '/login') { //未登录，强制登录
     next({
-      path: '/login',
-      query: {
-        redirect: to.fullPath
-      } // 将跳转的路由path作为参数，登录成功后跳转到该路由
-    })
+      name: "login" // 将跳转的路由path作为参数，登录成功后跳转到该路由
+    });
   } else {
     next();
   }
-
 })
